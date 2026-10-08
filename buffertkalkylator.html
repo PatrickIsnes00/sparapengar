@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buffertkalkylator — SparaPengar</title>
+<meta name="description" content="Räkna ut hur stor nödfond (buffert) du borde ha, och hur lång tid det tar att nå den med ditt månadssparande.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+<script>try{var t=localStorage.getItem("sp-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+</head>
+<body>
+
+<div id="site-header"></div>
+<script src="js/nav.js"></script>
+
+<main>
+  <section class="tool-header">
+    <div class="wrap">
+      <span class="eyebrow">🛡️ Kalkylator</span>
+      <h1>Buffertkalkylatorn</h1>
+      <p class="lead">En buffert (nödfond) gör att en oväntad utgift eller inkomstbortfall inte blir en kris. Räkna ut hur stor din borde vara — och hur lång tid det tar att nå dit.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:24px;">
+    <div class="wrap">
+      <div class="tool-layout">
+
+        <div class="panel">
+          <h2>Dina siffror</h2>
+
+          <div class="field">
+            <label for="manadsutgift">Dina utgifter per månad <span class="field-value" id="val-manadsutgift">20 000 kr</span></label>
+            <input type="number" id="manadsutgift" value="20000" min="0" step="500">
+            <input type="range" id="manadsutgift-r" value="20000" min="0" max="80000" step="500">
+            <div class="hint">Summan av boende, mat, räkningar och övriga återkommande utgifter.</div>
+          </div>
+
+          <div class="field">
+            <label>Hur många månaders buffert vill du ha?</label>
+            <div class="preset-row">
+              <button type="button" class="preset-btn" data-months="3">3 mån</button>
+              <button type="button" class="preset-btn active" data-months="6">6 mån</button>
+              <button type="button" class="preset-btn" data-months="12">12 mån</button>
+            </div>
+            <input type="number" id="manader" value="6" min="1" max="24" step="1">
+            <input type="range" id="manader-r" value="6" min="1" max="24" step="1">
+          </div>
+
+          <div class="field">
+            <label for="nuvarande">Redan sparat till bufferten <span class="field-value" id="val-nuvarande">5 000 kr</span></label>
+            <input type="number" id="nuvarande" value="5000" min="0" step="500">
+            <input type="range" id="nuvarande-r" value="5000" min="0" max="200000" step="500">
+          </div>
+
+          <div class="field">
+            <label for="sparande">Månatligt sparande till bufferten <span class="field-value" id="val-sparande">1 000 kr</span></label>
+            <input type="number" id="sparande" value="1000" min="0" step="100">
+            <input type="range" id="sparande-r" value="1000" min="0" max="20000" step="100">
+          </div>
+
+          <div class="field">
+            <label for="ranta">Ränta på buffertkontot <span class="field-value" id="val-ranta">2 %</span></label>
+            <input type="number" id="ranta" value="2" min="0" max="10" step="0.1">
+            <input type="range" id="ranta-r" value="2" min="0" max="8" step="0.1">
+            <div class="hint">Bufferten bör ligga tillgängligt, t.ex. på ett sparkonto — inte i aktier.</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="stat-row">
+            <div class="stat-tile">
+              <div class="label">Målbelopp</div>
+              <div class="value" id="stat-mal">0 kr</div>
+            </div>
+            <div class="stat-tile">
+              <div class="label">Kvar att spara</div>
+              <div class="value" id="stat-kvar">0 kr</div>
+            </div>
+            <div class="stat-tile">
+              <div class="label">Tid till mål</div>
+              <div class="value accent" id="stat-tid">–</div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom:18px;">
+            <div class="progress-bar"><div class="fill" id="buffert-fill" style="width:0%;"></div></div>
+            <div class="goal-result" id="buffert-result" style="margin-top:10px;"></div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head"><h3>Så når du din buffert</h3></div>
+            <div class="chart-canvas-wrap">
+              <canvas class="chart-canvas" id="buffert-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="note-box">
+            <strong>Hur stor buffert behöver jag?</strong> En vanlig tumregel är 3–6 månaders utgifter, men rätt nivå beror på din situation — fast anställning kontra eget företag, om ni är en eller två inkomsttagare i hushållet, och hur förutsägbara dina utgifter är.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="cta-band">
+        <div>
+          <h3>Vill du att bufferten ska växa snabbare?</h3>
+          <p>Prova budgetverktyget för att hitta mer utrymme i månadsbudgeten.</p>
+        </div>
+        <a href="budget.html" class="btn btn-secondary btn-lg">Hitta besparingar →</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/calc.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/buffert.js"></script>
+</body>
+</html>

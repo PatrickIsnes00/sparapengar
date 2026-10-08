@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skuld- &amp; amorteringskalkylator — SparaPengar</title>
+<meta name="description" content="Se hur lång tid det tar att bli skuldfri, hur mycket ränta du betalar totalt, och vad en extra avbetalning per månad sparar dig.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+<script>try{var t=localStorage.getItem("sp-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+</head>
+<body>
+
+<div id="site-header"></div>
+<script src="js/nav.js"></script>
+
+<main>
+  <section class="tool-header">
+    <div class="wrap">
+      <span class="eyebrow">💳 Kalkylator</span>
+      <h1>Skuld- &amp; amorteringskalkylatorn</h1>
+      <p class="lead">Lägg in en skuld, dess ränta och din månatliga betalning. Se hur länge det tar att bli skuldfri, hur mycket ränta du betalar totalt — och vad det ger att betala lite extra varje månad.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:24px;">
+    <div class="wrap">
+      <div class="tool-layout">
+
+        <div class="panel">
+          <h2>Din skuld</h2>
+
+          <div class="field">
+            <label for="skuld">Skuldbelopp <span class="field-value" id="val-skuld">50 000 kr</span></label>
+            <input type="number" id="skuld" value="50000" min="0" step="500">
+            <input type="range" id="skuld-r" value="50000" min="0" max="500000" step="500">
+          </div>
+
+          <div class="field">
+            <label for="ranta">Ränta (årlig) <span class="field-value" id="val-ranta">6 %</span></label>
+            <input type="number" id="ranta" value="6" min="0" max="40" step="0.1">
+            <input type="range" id="ranta-r" value="6" min="0" max="30" step="0.1">
+            <div class="hint">Privatlån/kreditkort kan ligga betydligt högre än bolån — kolla ditt avtal.</div>
+          </div>
+
+          <div class="field">
+            <label for="betalning">Månatlig betalning <span class="field-value" id="val-betalning">2 000 kr</span></label>
+            <input type="number" id="betalning" value="2000" min="0" step="100">
+            <input type="range" id="betalning-r" value="2000" min="0" max="20000" step="100">
+          </div>
+
+          <div class="field">
+            <label for="extra">Extra betalning per månad <span class="field-value" id="val-extra">500 kr</span></label>
+            <input type="number" id="extra" value="500" min="0" step="100">
+            <input type="range" id="extra-r" value="500" min="0" max="10000" step="100">
+            <div class="hint">Se vad som händer om du lägger lite extra ovanpå ordinarie betalning.</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="stat-row">
+            <div class="stat-tile">
+              <div class="label">Skuldfri om</div>
+              <div class="value" id="stat-tid">–</div>
+            </div>
+            <div class="stat-tile">
+              <div class="label">Total ränta du betalar</div>
+              <div class="value" id="stat-ranta">0 kr</div>
+            </div>
+            <div class="stat-tile">
+              <div class="label">Totalt betalat</div>
+              <div class="value" id="stat-totalt">0 kr</div>
+            </div>
+          </div>
+
+          <div id="warning-area"></div>
+
+          <div id="compare-area"></div>
+
+          <div class="chart-card">
+            <div class="chart-head">
+              <h3>Kvarvarande skuld över tid</h3>
+              <div class="chart-legend" id="skuld-legend"></div>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas class="chart-canvas" id="skuld-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="note-box">
+            Modellen antar att räntan är fast över tid och att hela betalningen går till samma skuld. Verkliga lån kan ha rörlig ränta, avgifter eller amorteringskrav som påverkar exakt utfall.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="cta-band">
+        <div>
+          <h3>Flera lån och krediter utspritt?</h3>
+          <p>Vi bygger ett verktyg för att samla dem till en lägre ränta.</p>
+          <div class="affiliate-note">Under utveckling.</div>
+        </div>
+        <a href="partners.html" class="btn btn-secondary btn-lg">Läs mer →</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/calc.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/skuld.js"></script>
+</body>
+</html>

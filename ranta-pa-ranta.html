@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ränta på ränta-kalkylator — SparaPengar</title>
+<meta name="description" content="Se hur ditt sparande växer över tid med ränta på ränta. Lägg in startkapital, månadssparande, avkastning och spartid — se resultatet som graf.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+<script>try{var t=localStorage.getItem("sp-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+</head>
+<body>
+
+<div id="site-header"></div>
+<script src="js/nav.js"></script>
+
+<main>
+  <section class="tool-header">
+    <div class="wrap">
+      <span class="eyebrow">📈 Kalkylator</span>
+      <h1>Ränta på ränta-kalkylatorn</h1>
+      <p class="lead">Mata in dina egna siffror och se hur sparandet växer år för år. Ju längre tid pengarna får jobba, desto större blir effekten av ränta på ränta.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:24px;">
+    <div class="wrap">
+      <div class="tool-layout">
+
+        <!-- Inmatning -->
+        <div class="panel">
+          <h2>Dina siffror</h2>
+
+          <div class="field">
+            <label for="startkapital">Startkapital <span class="field-value" id="val-startkapital">10 000 kr</span></label>
+            <input type="number" id="startkapital" value="10000" min="0" step="500">
+            <input type="range" id="startkapital-r" value="10000" min="0" max="500000" step="500">
+          </div>
+
+          <div class="field">
+            <label for="manadssparande">Månadssparande <span class="field-value" id="val-manadssparande">2 000 kr</span></label>
+            <input type="number" id="manadssparande" value="2000" min="0" step="100">
+            <input type="range" id="manadssparande-r" value="2000" min="0" max="30000" step="100">
+          </div>
+
+          <div class="field">
+            <label for="ranta">Årlig avkastning <span class="field-value" id="val-ranta">7 %</span></label>
+            <input type="number" id="ranta" value="7" min="0" max="30" step="0.1">
+            <input type="range" id="ranta-r" value="7" min="0" max="15" step="0.1">
+            <div class="hint">Historiskt globalt aktieindex ≈ 7–8%/år. Sparkonto ≈ 1–3%/år. Framtida avkastning är aldrig garanterad.</div>
+          </div>
+
+          <div class="field">
+            <label for="ar">Spartid <span class="field-value" id="val-ar">20 år</span></label>
+            <input type="number" id="ar" value="20" min="1" max="60" step="1">
+            <input type="range" id="ar-r" value="20" min="1" max="50" step="1">
+          </div>
+
+          <div class="toggle-row">
+            <span>Höj månadssparandet varje år</span>
+            <label class="switch">
+              <input type="checkbox" id="okning-toggle">
+              <span class="track"></span>
+            </label>
+          </div>
+          <div class="field" id="okning-field" style="display:none;">
+            <label for="okning">Årlig ökning <span class="field-value" id="val-okning">0 %</span></label>
+            <input type="number" id="okning" value="0" min="0" max="20" step="0.5">
+            <input type="range" id="okning-r" value="0" min="0" max="20" step="0.5">
+            <div class="hint">Simulerar t.ex. att du höjer sparandet i takt med löneökning.</div>
+          </div>
+        </div>
+
+        <!-- Resultat -->
+        <div>
+          <div class="stat-row">
+            <div class="stat-tile">
+              <div class="label">Slutvärde</div>
+              <div class="value" id="stat-slutvarde">0 kr</div>
+            </div>
+            <div class="stat-tile">
+              <div class="label">Totalt insatt</div>
+              <div class="value" id="stat-insatt">0 kr</div>
+            </div>
+            <div class="stat-tile">
+              <div class="label">Varav avkastning</div>
+              <div class="value accent" id="stat-avkastning">0 kr</div>
+              <div class="delta good" id="stat-andel">0% av slutvärdet</div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head">
+              <h3>Så växer ditt sparande</h3>
+              <div class="chart-legend" id="chart-legend"></div>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas class="chart-canvas" id="chart"></canvas>
+            </div>
+            <div class="chart-foot">
+              <button class="btn btn-ghost" id="toggle-table">Visa som tabell ↓</button>
+            </div>
+            <div class="data-table-wrap" id="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr><th>År</th><th>Insatt kapital</th><th>Avkastning</th><th>Totalt värde</th></tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="note-box">
+            <strong>Vad är ränta på ränta?</strong> När din avkastning i sin tur börjar generera ny avkastning växer kapitalet snabbare ju längre tid som går — kurvan böjer uppåt istället för att vara en rak linje. Formeln för slutvärdet av ett startkapital (utan löpande insättningar) är:
+            <div class="formula-box">Slutvärde = Startkapital × (1 + ränta) <sup>antal år</sup></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="cta-band">
+        <div>
+          <h3>Redo att faktiskt börja spara eller investera?</h3>
+          <p>Öppna ett sparkonto eller fondkonto hos en av våra partners.</p>
+          <div class="affiliate-note">Kopplas till affiliate-partner (t.ex. Avanza) senare — platshållare.</div>
+        </div>
+        <a href="#" class="btn btn-secondary btn-lg is-disabled" aria-disabled="true">Öppna konto (snart) →</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/calc.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/ranta.js"></script>
+</body>
+</html>

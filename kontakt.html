@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontakt — SparaPengar</title>
+<meta name="description" content="Kontakta SparaPengar med frågor, förslag eller samarbetsförfrågningar.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+<script>try{var t=localStorage.getItem("sp-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+</head>
+<body>
+
+<div id="site-header"></div>
+<script src="js/nav.js"></script>
+
+<main>
+  <div class="wrap" style="padding:40px 0 60px;">
+    <article class="article content-page">
+      <span class="eyebrow">✉️ Kontakt</span>
+      <h1>Hör av dig</h1>
+      <p class="article-lead">Frågor, förslag på nya verktyg eller samarbetsförfrågningar — vi vill gärna höra från dig.</p>
+
+      <div class="panel" style="max-width:520px; margin-top:10px;">
+        <form onsubmit="return false;">
+          <div class="field">
+            <label for="kontakt-namn">Namn</label>
+            <input type="text" id="kontakt-namn" placeholder="Ditt namn">
+          </div>
+          <div class="field">
+            <label for="kontakt-epost">E-post</label>
+            <input type="text" id="kontakt-epost" placeholder="din@epost.se">
+          </div>
+          <div class="field">
+            <label for="kontakt-meddelande">Meddelande</label>
+            <textarea id="kontakt-meddelande" rows="4" placeholder="Vad vill du säga oss?" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border-strong);background:var(--surface-chart);color:var(--text-primary);font-family:inherit;"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary is-disabled" aria-disabled="true">Skicka (snart) →</button>
+          <div class="affiliate-note" style="margin-top:10px;">Formuläret är inte aktivt ännu — kopplas till e-post/backend i nästa steg.</div>
+        </form>
+      </div>
+
+      <p style="margin-top:28px;">Du kan också nå oss direkt på <strong>hej@sparapengar.se</strong> (platshållaradress tills vidare).</p>
+    </article>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+</body>
+</html>
