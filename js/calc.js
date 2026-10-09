@@ -69,43 +69,151 @@ function manaderTillMal(p) {
 }
 
 /**
- * Simulerar avbetalning av en skuld månad för månad.
+ * Simulerar avbetalning av flera lån/krediter samtidigt, månad för månad.
  * @param {Object} p
- * @param {number} p.skuld      kr, skuld vid start
- * @param {number} p.ranta      årlig ränta i %, t.ex. 6 för 6%
- * @param {number} p.betalning  kr/månad, total betalning (ränta + amortering)
- * @returns {{rows:Array, manader:number, totalRanta:number, totalBetalt:number, omojligt:boolean}}
- *   omojligt = true om betalningen inte täcker räntan (skulden växer i all evighet)
+ * @param {Array<{skuld:number, ranta:number, betalning:number}>} p.lan  ränta i % per år, betalning i kr/mån
+ * @param {number}  [p.extra]      kr/månad extra som läggs på lånet som prioriteras enligt strategin
+ * @param {boolean} [p.rullaOver]  true = när ett lån är betalt flyttas dess månadsbetalning till nästa lån
+ * @param {string}  [p.strategi]   "lavin" (högst ränta först) eller "snoboll" (minst skuld först)
+ * @returns {{rows:Array<{manad:number, kvar:number}>, manader:number, totalRanta:number, totalBetalt:number,
+ *   omojligt:boolean, perLan:Array<{klarManad:number|null, ranta:number}>}}
+ *   omojligt = true om skulden inte blir betald inom 100 år
  */
-function simuleraSkuldAvbetalning(p) {
-  const skuldStart = Math.max(0, p.skuld || 0);
-  const manadsRanta = (p.ranta || 0) / 100 / 12;
-  const betalning = Math.max(0, p.betalning || 0);
+function simuleraFleraLan(p) {
+  const lan = (p.lan || []).map(function (l) {
+    return { skuld: Math.max(0, l.skuld || 0), manadsRanta: (l.ranta || 0) / 100 / 12, betalning: Math.max(0, l.betalning || 0) };
+  });
+  const extra = Math.max(0, p.extra || 0);
+  const rullaOver = !!p.rullaOver;
+  const kvar = lan.map(function (l) { return l.skuld; });
+  const perLan = lan.map(function (l) { return { klarManad: l.skuld > 0 ? null : 0, ranta: 0 }; });
+  const summa = function () { return kvar.reduce(function (a, b) { return a + b; }, 0); };
 
-  if (skuldStart <= 0) {
-    return { rows: [{ manad: 0, kvar: 0, ranta: 0 }], manader: 0, totalRanta: 0, totalBetalt: 0, omojligt: false };
-  }
-  if (betalning <= skuldStart * manadsRanta) {
-    return { rows: [{ manad: 0, kvar: skuldStart, ranta: 0 }], manader: null, totalRanta: null, totalBetalt: null, omojligt: true };
-  }
-
-  let kvar = skuldStart;
   let totalRanta = 0, totalBetalt = 0, manad = 0;
-  const rows = [{ manad: 0, kvar: Math.round(kvar), ranta: 0 }];
+  const rows = [{ manad: 0, kvar: Math.round(summa()) }];
 
-  while (kvar > 0 && manad < 1200) {
+  function betala(i, belopp) {
+    const bet = Math.min(belopp, kvar[i]);
+    kvar[i] -= bet;
+    totalBetalt += bet;
+    if (kvar[i] <= 0.005) { kvar[i] = 0; if (perLan[i].klarManad === null) perLan[i].klarManad = manad; }
+    return bet;
+  }
+
+  while (summa() > 0.005 && manad < 1200) {
+    manad++;
+    let pott = extra;
+    lan.forEach(function (l, i) {
+      if (kvar[i] <= 0) { if (rullaOver) pott += l.betalning; return; }
+      const ranta = kvar[i] * l.manadsRanta;
+      kvar[i] += ranta;
+      perLan[i].ranta += ranta;
+      totalRanta += ranta;
+      const bet = betala(i, l.betalning);
+      if (rullaOver) pott += l.betalning - bet;
+    });
+
+    // Fördela potten (extra + frigjorda betalningar) enligt strategin
+    const ordning = lan.map(function (_, i) { return i; }).filter(function (i) { return kvar[i] > 0; });
+    ordning.sort(p.strategi === "snoboll"
+      ? function (a, b) { return kvar[a] - kvar[b]; }
+      : function (a, b) { return lan[b].manadsRanta - lan[a].manadsRanta || kvar[a] - kvar[b]; });
+    for (let k = 0; k < ordning.length && pott > 0.005; k++) pott -= betala(ordning[k], pott);
+
+    rows.push({ manad: manad, kvar: Math.round(summa()) });
+  }
+
+  perLan.forEach(function (x) { x.ranta = Math.round(x.ranta); });
+  return { rows: rows, manader: manad, totalRanta: Math.round(totalRanta), totalBetalt: Math.round(totalBetalt), omojligt: summa() > 0.005, perLan: perLan };
+}
+
+/**
+ * Svenskt amorteringskrav utifrån belåningsgrad: över 70 % → 2 %/år, över 50 % → 1 %/år, annars inget krav.
+ * @param {number} belaningsgrad andel, t.ex. 0.83
+ * @returns {number} andel av ursprungligt lånebelopp per år (0, 0.01 eller 0.02)
+ */
+function amorteringskravProcent(belaningsgrad) {
+  if (belaningsgrad > 0.7) return 0.02;
+  if (belaningsgrad > 0.5) return 0.01;
+  return 0;
+}
+
+/**
+ * Simulerar ett lån med fast löptid (t.ex. bolån) månad för månad.
+ * @param {Object} p
+ * @param {number} p.belopp  kr, lånebelopp vid start
+ * @param {number} p.ranta   årlig ränta i %, t.ex. 3.5
+ * @param {number} p.ar      löptid i år (t.ex. 30 eller 50). För typ "krav": hur många år som simuleras.
+ * @param {string} p.typ     "rak" (fast amortering, sjunkande månadskostnad), "annuitet" (fast månadskostnad)
+ *                           eller "krav" (amortera bara det amorteringskravet kräver)
+ * @param {number} [p.varde] kr, bostadens värde. Om angivet gäller amorteringskravet som lägsta amortering.
+ * @param {number} [p.extra] kr/månad, extra amortering utöver planen
+ * @returns {{rows:Array<{manad:number, kvar:number, ranta:number, betalning:number}>, manader:number,
+ *   totalRanta:number, totalBetalt:number, forstaBetalning:number, skuldfri:boolean, kvarVidSlut:number, kravStyr:boolean}}
+ *   kravStyr = true om amorteringskravet någon månad krävde mer än planen
+ */
+function simuleraLan(p) {
+  const belopp = Math.max(0, p.belopp || 0);
+  const manadsRanta = (p.ranta || 0) / 100 / 12;
+  const n = Math.max(1, Math.round((p.ar || 0) * 12));
+  const extra = Math.max(0, p.extra || 0);
+  const varde = Math.max(0, p.varde || 0);
+
+  if (belopp <= 0) {
+    return { rows: [{ manad: 0, kvar: 0, ranta: 0, betalning: 0 }], manader: 0, totalRanta: 0, totalBetalt: 0, forstaBetalning: 0, skuldfri: true, kvarVidSlut: 0, kravStyr: false };
+  }
+
+  const annuitet = manadsRanta > 0
+    ? belopp * manadsRanta / (1 - Math.pow(1 + manadsRanta, -n))
+    : belopp / n;
+  const rakAmortering = belopp / n;
+
+  let kvar = belopp;
+  let totalRanta = 0, totalBetalt = 0, manad = 0, forstaBetalning = 0, kravStyr = false;
+  const rows = [{ manad: 0, kvar: Math.round(kvar), ranta: 0, betalning: 0 }];
+  // Med bara amorteringskravet kan lånet ligga kvar för evigt (inget krav under 50 %) — simulera då löptiden ut
+  const maxManader = p.typ === "krav" ? n : 1200;
+
+  while (kvar > 0.005 && manad < maxManader) {
     manad++;
     const ranta = kvar * manadsRanta;
-    let betalDennaManad = betalning;
-    if (betalDennaManad > kvar + ranta) betalDennaManad = kvar + ranta;
-    kvar = kvar + ranta - betalDennaManad;
-    if (kvar < 0) kvar = 0;
+    const krav = varde > 0 ? amorteringskravProcent(kvar / varde) * belopp / 12 : 0;
+    let amortering = p.typ === "krav" ? krav : p.typ === "annuitet" ? annuitet - ranta : rakAmortering;
+    if (amortering < krav - 0.005) { amortering = krav; kravStyr = true; }
+    amortering = Math.min(kvar, amortering + extra);
+    const betalning = ranta + amortering;
+    kvar = Math.max(0, kvar - amortering);
     totalRanta += ranta;
-    totalBetalt += betalDennaManad;
-    rows.push({ manad: manad, kvar: Math.round(kvar), ranta: Math.round(ranta) });
+    totalBetalt += betalning;
+    if (manad === 1) forstaBetalning = betalning;
+    rows.push({ manad: manad, kvar: Math.round(kvar), ranta: ranta, betalning: betalning });
   }
 
-  return { rows: rows, manader: manad, totalRanta: Math.round(totalRanta), totalBetalt: Math.round(totalBetalt), omojligt: false };
+  const skuldfri = kvar <= 0.005;
+  return {
+    rows: rows, manader: manad, totalRanta: Math.round(totalRanta), totalBetalt: Math.round(totalBetalt),
+    forstaBetalning: Math.round(forstaBetalning), skuldfri: skuldfri, kvarVidSlut: skuldfri ? 0 : Math.round(kvar), kravStyr: kravStyr,
+  };
+}
+
+/**
+ * Ungefärligt svenskt ränteavdrag: 30 % på räntekostnader upp till 100 000 kr/år, 21 % på överskjutande del.
+ * @param {Array<{manad:number, ranta:number}>} rows månadsrader från simuleraLan
+ * @returns {number} kr, totalt skatteavdrag över lånets livstid
+ */
+function uppskattaRanteavdrag(rows) {
+  const perAr = {};
+  rows.forEach(function (r) {
+    if (r.manad === 0) return;
+    const ar = Math.ceil(r.manad / 12);
+    perAr[ar] = (perAr[ar] || 0) + r.ranta;
+  });
+  let avdrag = 0;
+  Object.keys(perAr).forEach(function (ar) {
+    const r = perAr[ar];
+    avdrag += Math.min(r, 100000) * 0.3 + Math.max(0, r - 100000) * 0.21;
+  });
+  return Math.round(avdrag);
 }
 
 /**
