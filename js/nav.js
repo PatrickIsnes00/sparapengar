@@ -39,6 +39,7 @@
       '<a href="barn.html" data-nav="barn.html">Barn &amp; Pengar</a>' +
       '<a href="guider.html" data-nav="guider.html">Guider</a>' +
       '<a href="partners.html" data-nav="partners.html">Partners <span class="soon-badge">Snart</span></a>' +
+      '<a href="mitt-konto.html" data-nav="mitt-konto.html">⭐ Mitt konto <span class="soon-badge">Snart</span></a>' +
     "</nav>" +
     '<div class="header-actions">' +
       '<button class="theme-toggle" aria-label="Byt tema">' + (currentIsDark() ? "☀️" : "🌙") + "</button>" +
@@ -64,6 +65,7 @@
         '<li><a href="barn.html">Barn &amp; Pengar</a></li>' +
         '<li><a href="guider.html">Guider</a></li>' +
         '<li><a href="partners.html">Partners</a></li>' +
+        '<li><a href="mitt-konto.html">Mitt konto</a></li>' +
       "</ul></div>" +
       "<div><h4>Om</h4><ul>" +
         '<li><a href="om-oss.html">Om oss</a></li>' +
