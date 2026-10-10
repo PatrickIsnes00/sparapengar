@@ -435,6 +435,21 @@ table.data-table thead th { color: var(--text-muted); font-weight: 600; font-siz
   text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;
 }
 .expense-head span:not(:first-child) { text-align: right; }
+.expense-row.suggested input[id^="sav-"] { border-color: var(--good); background: var(--accent-wash); }
+.suggest-area { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--grid); }
+.suggest-area .hint { margin-top: 8px; }
+.suggest-list { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 8px; }
+.suggest-list[hidden] { display: none; }
+.suggest-list li {
+  padding: 10px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+  background: var(--surface-sunken); font-size: 0.85rem; color: var(--text-secondary);
+}
+.suggest-list li strong { color: var(--text-primary); }
+.suggest-list li.top { background: var(--accent-wash); border-color: var(--good); }
+.suggest-badge {
+  display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px;
+  background: var(--good-text); color: #fff; font-size: 0.7rem; font-weight: 700;
+}
 
 /* ---------- Dynamiska budgetrader (hushållsbudget: inkomster/utgifter) ---------- */
 .budget-group-head {
