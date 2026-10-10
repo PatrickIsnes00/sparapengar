@@ -170,7 +170,15 @@
       }).join("");
     }
 
-    [["pris", "prisR"], ["insats", "insatsR"], ["ranta", "rantaR"], ["rest", "restR"], ["extra", "extraR"]]
+    // När priset ändras sätts kontantinsatsen till 20 % av det nya priset. Användaren kan sedan
+    // ändra insatsen fritt, tills priset ändras igen.
+    syncPair(els.pris, els.prisR, function () {
+      const pris = Math.max(0, parseFloat(els.pris.value) || 0);
+      els.insatsR.max = Math.max(pris, 1); // annars kapas reglaget vid det gamla priset
+      els.insats.value = els.insatsR.value = Math.ceil(pris * MIN_INSATS);
+      render();
+    });
+    [["insats", "insatsR"], ["ranta", "rantaR"], ["rest", "restR"], ["extra", "extraR"]]
       .forEach(function (pair) { syncPair(els[pair[0]], els[pair[1]], render); });
     [els.manader, els.uppl, els.avi].forEach(function (el) { el.addEventListener("input", render); });
     manadBtns.forEach(function (btn) {
