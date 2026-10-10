@@ -229,6 +229,7 @@
       ranta: document.getElementById("bolan-ranta"), rantaR: document.getElementById("bolan-ranta-r"),
       ar: document.getElementById("bolan-ar"),
       extra: document.getElementById("bolan-extra"), extraR: document.getElementById("bolan-extra-r"),
+      drift: document.getElementById("bolan-drift"),
     };
     const vals = {
       varde: document.getElementById("val-bolan-varde"),
@@ -237,7 +238,9 @@
       ranta: document.getElementById("val-bolan-ranta"),
       ar: document.getElementById("val-bolan-ar"),
       extra: document.getElementById("val-bolan-extra"),
+      drift: document.getElementById("val-bolan-drift"),
     };
+    const kostnadTabell = document.getElementById("bolan-kostnad-tabell");
     const arBtns = document.querySelectorAll("#bolan-ar-presets .preset-btn");
     const typBtns = document.querySelectorAll("#bolan-typ .preset-btn");
     const typHint = document.getElementById("bolan-typ-hint");
@@ -262,6 +265,7 @@
       const ranta = Math.max(0, parseFloat(els.ranta.value) || 0);
       const ar = Math.min(100, Math.max(1, Math.round(parseFloat(els.ar.value) || 1)));
       const extra = Math.max(0, parseFloat(els.extra.value) || 0);
+      const drift = Math.max(0, parseFloat(els.drift.value) || 0);
 
       els.insatsR.max = Math.max(varde, 1);
       vals.varde.textContent = formatKr(varde);
@@ -271,9 +275,13 @@
       vals.ranta.textContent = ranta.toLocaleString("sv-SE") + " %";
       vals.ar.textContent = ar + " år";
       vals.extra.textContent = formatKr(extra);
+      vals.drift.textContent = formatKr(drift);
       arBtns.forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-ar") === String(ar)); });
       typBtns.forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-typ") === typ); });
-      typHint.textContent = TYP_HINT[typ];
+      // Rak amortering på X år = 100/X % av lånet per år — det blandas lätt ihop med amorteringskravet
+      typHint.textContent = TYP_HINT[typ] + (typ === "rak" && belopp > 0
+        ? " Att betala av lånet på " + ar + " år betyder " + (Math.round(1000 / ar) / 10).toLocaleString("sv-SE") + " % av lånet per år (" + formatKr(belopp / (ar * 12)) + "/mån)."
+        : "");
       document.getElementById("bolan-ar-label").textContent = typ === "krav" ? "Räkna på" : "Återbetalningstid";
       document.getElementById("bolan-ar-hint").textContent = typ === "krav"
         ? "Hur många år framåt vi räknar. Med bara amorteringskravet blir lånet sällan helt betalt."
@@ -299,9 +307,14 @@
         if (m50 !== null) steg.push("under 50 % om " + formatManader(m50) + " → inget krav");
         if (steg.length) html += '<div class="hint">Med den här planen: ' + steg.join(", ") + ".</div>";
         if (typ !== "krav") {
-          html += '<div class="hint">' + (base.kravStyr
-            ? "Din plan amorterar periodvis mindre än kravet — där har vi räknat med kravet istället."
-            : "Din plan amorterar mer än kravet hela vägen. ✓") + "</div>";
+          let planText = "Din plan amorterar mer än kravet hela vägen. ✓";
+          if (base.kravStyr) {
+            planText = "Din plan amorterar periodvis mindre än kravet — där har vi räknat med kravet istället.";
+          } else if (typ === "rak" && 1 / ar > kravNu) {
+            planText = "Rak amortering på " + ar + " år amorterar " + (Math.round(1000 / ar) / 10).toLocaleString("sv-SE") + " % per år — mer än kravet. " +
+              "Banker räknar ofta bara med kravet; välj \"Amorteringskravet\" för att jämföra.";
+          }
+          html += '<div class="hint">' + planText + "</div>";
         }
         kravBox.innerHTML = html;
       } else {
@@ -310,6 +323,27 @@
 
       document.getElementById("bolan-stat-manad-label").textContent = typ === "annuitet" && !base.kravStyr ? "Månadskostnad" : "Första månadskostnaden";
       document.getElementById("bolan-stat-manad").textContent = formatKr(base.forstaBetalning);
+
+      // Första månaden uppdelad: ränta, ränteavdrag, amortering och boendekostnader.
+      // Avdragssatsen tas från första årets ränta så att 100 000 kr-gränsen räknas rätt.
+      const forstaRanta = base.rows.length > 1 ? base.rows[1].ranta : 0;
+      const forstaAmortering = Math.max(0, base.forstaBetalning - Math.round(forstaRanta));
+      const forstaArsRanta = base.rows.slice(1, 13).reduce(function (sum, r) { return sum + r.ranta; }, 0);
+      const avdragManad = forstaArsRanta > 0 ? forstaRanta * ranteavdragForAr(forstaArsRanta) / forstaArsRanta : 0;
+      const nettoLan = base.forstaBetalning - Math.round(avdragManad);
+      const totaltManad = nettoLan + drift;
+      document.getElementById("bolan-stat-netto").textContent = avdragManad > 0 || drift > 0
+        ? "ca " + formatKr(totaltManad) + " efter ränteavdrag" + (drift > 0 ? " inkl. boendekostnader" : "")
+        : "";
+      const kostnadsRader = [
+        ["Ränta", formatKr(forstaRanta)],
+        ["Ränteavdrag", avdragManad > 0 ? "−" + formatKr(avdragManad) : formatKr(0)],
+        ["Amortering", formatKr(forstaAmortering)],
+      ];
+      if (drift > 0) kostnadsRader.push(["Boendekostnader", formatKr(drift)]);
+      kostnadTabell.innerHTML = kostnadsRader.map(function (r) {
+        return "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td></tr>";
+      }).join("") + '<tr class="total"><td>Totalt per månad</td><td>' + formatKr(totaltManad) + "</td></tr>";
       document.getElementById("bolan-stat-ranta-label").textContent = base.skuldfri ? "Total ränta" : "Ränta på " + ar + " år";
       document.getElementById("bolan-stat-ranta").textContent = formatKr(base.totalRanta);
       document.getElementById("bolan-stat-avdrag").textContent = avdrag > 0 ? "ca " + formatKr(base.totalRanta - avdrag) + " efter ränteavdrag" : "";
@@ -372,6 +406,7 @@
     [["varde", "vardeR"], ["insats", "insatsR"], ["ranta", "rantaR"], ["extra", "extraR"]]
       .forEach(function (pair) { syncPair(els[pair[0]], els[pair[1]], render); });
     els.ar.addEventListener("input", render);
+    els.drift.addEventListener("input", render);
     arBtns.forEach(function (btn) {
       btn.addEventListener("click", function () { els.ar.value = btn.getAttribute("data-ar"); render(); });
     });

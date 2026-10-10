@@ -197,7 +197,16 @@ function simuleraLan(p) {
 }
 
 /**
- * Ungefärligt svenskt ränteavdrag: 30 % på räntekostnader upp till 100 000 kr/år, 21 % på överskjutande del.
+ * Ungefärligt svenskt ränteavdrag för ett års räntekostnad: 30 % upp till 100 000 kr, 21 % på överskjutande del.
+ * @param {number} arsRanta kr, räntekostnad under ett år
+ * @returns {number} kr
+ */
+function ranteavdragForAr(arsRanta) {
+  return Math.min(arsRanta, 100000) * 0.3 + Math.max(0, arsRanta - 100000) * 0.21;
+}
+
+/**
+ * Ungefärligt svenskt ränteavdrag över hela lånets livstid (se ranteavdragForAr).
  * @param {Array<{manad:number, ranta:number}>} rows månadsrader från simuleraLan
  * @returns {number} kr, totalt skatteavdrag över lånets livstid
  */
@@ -210,8 +219,7 @@ function uppskattaRanteavdrag(rows) {
   });
   let avdrag = 0;
   Object.keys(perAr).forEach(function (ar) {
-    const r = perAr[ar];
-    avdrag += Math.min(r, 100000) * 0.3 + Math.max(0, r - 100000) * 0.21;
+    avdrag += ranteavdragForAr(perAr[ar]);
   });
   return Math.round(avdrag);
 }

@@ -87,6 +87,12 @@
             <input type="range" id="bolan-extra-r" value="1000" min="0" max="30000" step="100">
             <div class="hint">Se vad som händer om du amorterar lite extra ovanpå planen.</div>
           </div>
+
+          <div class="field">
+            <label for="bolan-drift">Boendekostnader per månad <span class="field-value" id="val-bolan-drift">0 kr</span></label>
+            <input type="number" id="bolan-drift" value="0" min="0" step="100">
+            <div class="hint">Villa: fastighetsavgift (max ca 870 kr/mån) plus el, vatten och försäkring. Bostadsrätt: månadsavgiften till föreningen. Påverkar bara månadskostnaden, inte lånet.</div>
+          </div>
         </div>
 
         <div>
@@ -94,6 +100,7 @@
             <div class="stat-tile">
               <div class="label" id="bolan-stat-manad-label">Första månadskostnaden</div>
               <div class="value" id="bolan-stat-manad">–</div>
+              <div class="hint" id="bolan-stat-netto"></div>
             </div>
             <div class="stat-tile">
               <div class="label" id="bolan-stat-ranta-label">Total ränta</div>
@@ -109,6 +116,18 @@
           <div id="bolan-warning-area"></div>
 
           <div class="krav-box" id="bolan-krav-box"></div>
+
+          <div class="chart-card">
+            <div class="chart-head">
+              <h3>Vad du betalar första månaden</h3>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="data-table">
+                <tbody id="bolan-kostnad-tabell"></tbody>
+              </table>
+            </div>
+            <div class="hint" style="margin-top:8px;">Ränteavdraget får du tillbaka via skatten (30 % av räntan upp till 100 000 kr per år, 21 % på resten). Extra amortering ingår inte.</div>
+          </div>
 
           <div id="bolan-compare-area"></div>
 
