@@ -34,6 +34,7 @@
           '<a href="buffertkalkylator.html" data-nav="buffertkalkylator.html">🛡️ Buffertkalkylator</a>' +
           '<a href="skuldkalkylator.html" data-nav="skuldkalkylator.html">💳 Skuld &amp; amortering</a>' +
           '<a href="billan-kalkylator.html" data-nav="billan-kalkylator.html">🚗 Billån</a>' +
+          '<a href="fyraprocentsregeln.html" data-nav="fyraprocentsregeln.html">🏖️ 4 %-regeln</a>' +
           '<a href="nettolon-kalkylator.html" data-nav="nettolon-kalkylator.html">🧮 Nettolön</a>' +
         "</div>" +
       "</div>" +
@@ -61,6 +62,7 @@
         '<li><a href="buffertkalkylator.html">Buffertkalkylator</a></li>' +
         '<li><a href="skuldkalkylator.html">Skuld &amp; amortering</a></li>' +
         '<li><a href="billan-kalkylator.html">Billån</a></li>' +
+        '<li><a href="fyraprocentsregeln.html">4 %-regeln</a></li>' +
         '<li><a href="nettolon-kalkylator.html">Nettolön</a></li>' +
       "</ul></div>" +
       "<div><h4>Mer</h4><ul>" +

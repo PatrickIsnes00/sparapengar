@@ -356,6 +356,36 @@ function effektivRanta(utbetalt, betalning, n, slut) {
   return Math.round((Math.pow(1 + lo, 12) - 1) * 1000) / 10;
 }
 
+/**
+ * 4 %-regeln: tar ut en fast andel av innehavet varje år, resten fortsätter växa.
+ * Förenklad modell där innehavet ändras med (avkastning − uttag) per år, alltså
+ * 8 % avkastning och 4 % uttag ger 4 % tillväxt.
+ * @param {Object} p
+ * @param {number} p.kapital    kr, innehav vid start
+ * @param {number} p.avkastning årlig avkastning i %
+ * @param {number} p.uttag      årligt uttag i % av innehavet
+ * @param {number} p.inflation  årlig inflation i %
+ * @param {number} p.ar         antal år
+ * @returns {Array<{ar:number, varde:number, real:number, uttagAr:number, tillvaxtAr:number, totaltUttag:number}>}
+ *   En rad per år (innehav vid årets början), plus slutpunkten (år = p.ar).
+ */
+function simuleraUttag(p) {
+  const r = (p.avkastning || 0) / 100;
+  const w = (p.uttag || 0) / 100;
+  const inf = (p.inflation || 0) / 100;
+  const rows = [];
+  let varde = Math.max(0, p.kapital || 0);
+  let totaltUttag = 0;
+  for (let ar = 0; ar <= p.ar; ar++) {
+    const uttagAr = varde * w;
+    const tillvaxtAr = varde * (r - w);
+    rows.push({ ar: ar, varde: varde, real: varde / Math.pow(1 + inf, ar), uttagAr: uttagAr, tillvaxtAr: tillvaxtAr, totaltUttag: totaltUttag });
+    totaltUttag += uttagAr;
+    varde = Math.max(0, varde + tillvaxtAr);
+  }
+  return rows;
+}
+
 /** Formaterar kr utan decimaler, med tusentalsavgränsare (sv-SE). */
 function formatKr(n) {
   return Math.round(n).toLocaleString("sv-SE") + " kr";
