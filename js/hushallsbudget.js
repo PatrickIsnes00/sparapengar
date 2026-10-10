@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SparaPengar — Hushållsbudget: inkomster minus utgifter = överskott,
+   Guldgrisen — Hushållsbudget: inkomster minus utgifter = överskott,
    och vad överskottet kan bli värt om det investeras.
    ========================================================================== */
 (function () {

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SparaPengar — Intresselista för "Mitt konto"
+   Guldgrisen — Intresselista för "Mitt konto"
    Lägg <div data-waitlist="kompakt" data-kalla="skuld"></div> där formuläret ska synas.
    data-waitlist: "kompakt" (bara e-post) eller "full" (e-post + intressen + pris).
    data-kalla: varifrån anmälan kom — så vi ser vilka verktyg som driver intresset.
@@ -30,7 +30,7 @@
     try { localStorage.setItem(LAGRAD_NYCKEL, "1"); } catch (e) { /* no-op */ }
   }
 
-  var KLAR_HTML = '<div class="waitlist-klar">✅ <strong>Du står på listan!</strong> Vi hör av oss när Mitt konto öppnar — du får först tillgång och ett lanseringserbjudande.</div>';
+  var KLAR_HTML = '<div class="waitlist-klar">✅ <strong>Du står på listan!</strong> Vi hör av oss när Mitt konto öppnar. Du får först tillgång och ett lanseringserbjudande.</div>';
 
   function formHtml(full, id) {
     var html = '<form class="waitlist-form" novalidate>' +
@@ -76,7 +76,7 @@
         return;
       }
       if (!WAITLIST_ENDPOINT) {
-        status.textContent = "Intresselistan är inte kopplad ännu — försök igen snart.";
+        status.textContent = "Intresselistan är inte kopplad ännu. Försök igen snart.";
         status.className = "waitlist-status fel";
         return;
       }
@@ -100,7 +100,7 @@
         })
         .catch(function () {
           knapp.disabled = false;
-          status.textContent = "Något gick fel — kontrollera din uppkoppling och försök igen.";
+          status.textContent = "Något gick fel. Kontrollera din uppkoppling och försök igen.";
           status.className = "waitlist-status fel";
         });
     });

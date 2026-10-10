@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SparaPengar — delad header/footer-injektion, navigation, tema, dropdown
+   Guldgrisen — delad header/footer-injektion, navigation, tema, dropdown
    Varje sida behöver bara: <div id="site-header"></div> direkt efter <body>
    (med detta script-tag direkt efter), och <div id="site-footer"></div>
    längre ner där footern ska ligga.
@@ -22,7 +22,7 @@
   /* ---------------- Header-mall ---------------- */
   var HEADER_HTML =
     '<header class="site-header"><div class="wrap">' +
-    '<a href="index.html" class="brand"><span class="logo-mark">💰</span> SparaPengar</a>' +
+    '<a href="index.html" class="brand"><span class="logo-mark">🐷</span> Guldgrisen</a>' +
     '<nav class="main-nav">' +
       '<a href="index.html" data-nav="index.html">Hem</a>' +
       '<div class="nav-dropdown">' +
@@ -33,6 +33,7 @@
           '<a href="budget.html" data-nav="budget.html">🧾 Spara på utgifter</a>' +
           '<a href="buffertkalkylator.html" data-nav="buffertkalkylator.html">🛡️ Buffertkalkylator</a>' +
           '<a href="skuldkalkylator.html" data-nav="skuldkalkylator.html">💳 Skuld &amp; amortering</a>' +
+          '<a href="billan-kalkylator.html" data-nav="billan-kalkylator.html">🚗 Billån</a>' +
           '<a href="nettolon-kalkylator.html" data-nav="nettolon-kalkylator.html">🧮 Nettolön</a>' +
         "</div>" +
       "</div>" +
@@ -51,14 +52,15 @@
   var FOOTER_HTML =
     '<footer class="site-footer"><div class="wrap">' +
     '<div class="footer-grid">' +
-      '<div><div class="brand" style="margin-bottom:10px;"><span class="logo-mark">💰</span> SparaPengar</div>' +
-      "<p>SparaPengar hjälper dig ta kontroll över din ekonomi – räkna på sparande, hitta onödiga utgifter och lär barnen värdet av pengar.</p></div>" +
+      '<div><div class="brand" style="margin-bottom:10px;"><span class="logo-mark">🐷</span> Guldgrisen</div>' +
+      "<p>Guldgrisen hjälper dig ta kontroll över din ekonomi. Räkna på sparande, hitta onödiga utgifter och lär barnen värdet av pengar.</p></div>" +
       "<div><h4>Ekonomiska verktyg</h4><ul>" +
         '<li><a href="ranta-pa-ranta.html">Ränta på ränta</a></li>' +
         '<li><a href="hushallsbudget.html">Hushållsbudget</a></li>' +
         '<li><a href="budget.html">Spara på utgifter</a></li>' +
         '<li><a href="buffertkalkylator.html">Buffertkalkylator</a></li>' +
         '<li><a href="skuldkalkylator.html">Skuld &amp; amortering</a></li>' +
+        '<li><a href="billan-kalkylator.html">Billån</a></li>' +
         '<li><a href="nettolon-kalkylator.html">Nettolön</a></li>' +
       "</ul></div>" +
       "<div><h4>Mer</h4><ul>" +
@@ -71,10 +73,11 @@
         '<li><a href="om-oss.html">Om oss</a></li>' +
         '<li><a href="integritetspolicy.html">Integritetspolicy</a></li>' +
         '<li><a href="kontakt.html">Kontakt</a></li>' +
+        '<li><a href="https://www.instagram.com/guldgrisen/" target="_blank" rel="noopener">Instagram @guldgrisen</a></li>' +
       "</ul></div>" +
     "</div>" +
     '<div class="footer-bottom">' +
-      "<span>© 2026 SparaPengar. Allt innehåll är generell information, inte individuell finansiell rådgivning.</span>" +
+      "<span>© 2026 Guldgrisen. Allt innehåll är generell information, inte individuell finansiell rådgivning.</span>" +
       "<span>Byggd med 💙 för ett tryggare sparande.</span>" +
     "</div>" +
     "</div></footer>";

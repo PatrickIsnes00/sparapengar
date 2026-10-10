@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Billånskalkylator | Guldgrisen</title>
+<meta name="description" content="Räkna på ditt billån med eller utan restvärde. Se månadskostnad, total ränta, effektiv ränta och vad restvärdet innebär i slutet av löptiden.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐷</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+<script>try{var t=localStorage.getItem("sp-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+</head>
+<body>
+
+<div id="site-header"></div>
+<script src="js/nav.js"></script>
+
+<main>
+  <section class="tool-header">
+    <div class="wrap">
+      <span class="eyebrow">🚗 Kalkylator</span>
+      <h1>Billånskalkylatorn</h1>
+      <p class="lead">Jämför ett vanligt billån med ett lån med restvärde. Se vad bilen kostar per månad, hur mycket du betalar i ränta och vad som återstår att betala när löptiden är slut.</p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:24px;">
+    <div class="wrap">
+      <div class="tool-layout">
+
+        <div class="panel">
+          <h2>Ditt billån</h2>
+
+          <div class="field">
+            <label for="bil-pris">Bilens pris <span class="field-value" id="val-bil-pris">350 000 kr</span></label>
+            <input type="number" id="bil-pris" value="350000" min="0" step="5000">
+            <input type="range" id="bil-pris-r" value="350000" min="0" max="1500000" step="5000">
+          </div>
+
+          <div class="field">
+            <label for="bil-insats">Kontantinsats <span class="field-value" id="val-bil-insats">70 000 kr</span></label>
+            <input type="number" id="bil-insats" value="70000" min="0" step="5000">
+            <input type="range" id="bil-insats-r" value="70000" min="0" max="350000" step="5000">
+            <div class="hint" id="bil-insats-hint"></div>
+          </div>
+
+          <div class="field">
+            <label>Lånebelopp <span class="field-value" id="val-bil-belopp">280 000 kr</span></label>
+          </div>
+
+          <div class="field">
+            <label for="bil-ranta">Ränta (årlig) <span class="field-value" id="val-bil-ranta">6,5 %</span></label>
+            <input type="number" id="bil-ranta" value="6.5" min="0" max="25" step="0.05">
+            <input type="range" id="bil-ranta-r" value="6.5" min="0" max="15" step="0.05">
+          </div>
+
+          <div class="field">
+            <label for="bil-manader">Löptid <span class="field-value" id="val-bil-manader">36 mån</span></label>
+            <div class="preset-row" id="bil-manader-presets">
+              <button type="button" class="preset-btn" data-manader="24">2 år</button>
+              <button type="button" class="preset-btn active" data-manader="36">3 år</button>
+              <button type="button" class="preset-btn" data-manader="48">4 år</button>
+              <button type="button" class="preset-btn" data-manader="60">5 år</button>
+              <button type="button" class="preset-btn" data-manader="72">6 år</button>
+              <button type="button" class="preset-btn" data-manader="84">7 år</button>
+            </div>
+            <input type="number" id="bil-manader" value="36" min="1" max="120" step="1">
+            <div class="hint">Antal månader. Lån med restvärde finns nästan bara upp till 36 månader.</div>
+          </div>
+
+          <div class="field">
+            <label for="bil-rest">Restvärde <span class="field-value" id="val-bil-rest">40 %</span></label>
+            <input type="number" id="bil-rest" value="40" min="0" max="80" step="1">
+            <input type="range" id="bil-rest-r" value="40" min="0" max="80" step="1">
+            <div class="hint" id="bil-rest-hint"></div>
+          </div>
+
+          <div class="field">
+            <label for="bil-uppl">Uppläggningsavgift <span class="field-value" id="val-bil-uppl">595 kr</span></label>
+            <input type="number" id="bil-uppl" value="595" min="0" step="5">
+          </div>
+
+          <div class="field">
+            <label for="bil-avi">Aviavgift per månad <span class="field-value" id="val-bil-avi">49 kr</span></label>
+            <input type="number" id="bil-avi" value="49" min="0" step="1">
+            <div class="hint">Kolla långivarens prislista, eftersom avgifterna påverkar den effektiva räntan.</div>
+          </div>
+        </div>
+
+        <div>
+          <div id="bil-warning-area"></div>
+
+          <div class="compare-callout">
+            <div class="compare-col base">
+              <div class="ccl-label">Utan restvärde</div>
+              <div class="ccl-value" id="bil-utan-manad">–</div>
+              <div class="hint" id="bil-utan-hint"></div>
+            </div>
+            <div class="compare-col improved">
+              <div class="ccl-label" id="bil-med-label">Med restvärde</div>
+              <div class="ccl-value" id="bil-med-manad">–</div>
+              <div class="hint" id="bil-med-hint"></div>
+            </div>
+          </div>
+          <p id="bil-sammanfattning" style="font-weight:600;color:var(--text-primary);"></p>
+
+          <div class="chart-card">
+            <div class="chart-head">
+              <h3>Jämförelse</h3>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="data-table">
+                <thead>
+                  <tr><th></th><th>Utan restvärde</th><th>Med restvärde</th></tr>
+                </thead>
+                <tbody id="bil-jamfor-tabell"></tbody>
+              </table>
+            </div>
+            <div class="hint" style="margin-top:8px;">Kreditkostnad = ränta + avgifter. Effektiv ränta räknar in avgifterna och är det bästa måttet för att jämföra lån.</div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head">
+              <h3>Kvar att betala på lånet</h3>
+              <div class="chart-legend" id="bil-legend"></div>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas class="chart-canvas" id="bil-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-head">
+              <h3>Jämför löptider</h3>
+            </div>
+            <div style="overflow-x:auto;">
+              <table class="data-table">
+                <thead>
+                  <tr><th>Löptid</th><th>Utan restvärde</th><th>Med restvärde</th><th>Kreditkostnad utan / med</th></tr>
+                </thead>
+                <tbody id="bil-lopetid-tabell"></tbody>
+              </table>
+            </div>
+            <div class="hint" style="margin-top:8px;">Månadskostnad inkl. aviavgift, med samma ränta och restvärde som ovan. Restvärde visas bara för löptider upp till 36 månader.</div>
+          </div>
+
+          <div class="note-box">
+            <strong>Så funkar restvärde.</strong> Restvärde erbjuds nästan bara på lån upp till 36 månader. Med restvärde betalar du bara av en del av lånet under löptiden. Resten, restvärdet, ska betalas som en klumpsumma när löptiden är slut. Då kan du betala kontant, låna om restvärdet eller sälja/byta bilen. Månadskostnaden blir lägre, men du betalar ränta på en större skuld hela tiden och därför mer i ränta totalt. Är bilen värd mindre än restvärdet när det är dags att betala får du stå för mellanskillnaden.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="cta-band">
+        <div>
+          <h3>Har bilen plats i budgeten?</h3>
+          <p>Lägg in månadskostnaden i hushållsbudgeten och se vad du har kvar varje månad.</p>
+        </div>
+        <a href="hushallsbudget.html" class="btn btn-secondary btn-lg">Till hushållsbudgeten →</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="site-footer"></div>
+
+<script src="js/calc.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/billan.js"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SparaPengar — Nettolön-kalkylatorn (förenklad uppskattning)
+   Guldgrisen — Nettolön-kalkylatorn (förenklad uppskattning)
    ========================================================================== */
 (function () {
   "use strict";

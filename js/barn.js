@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SparaPengar — Barn & Pengar: åldersväxling, sparmål, tjäna pengar, quiz
+   Guldgrisen — Barn & Pengar: åldersväxling, sparmål, tjäna pengar, quiz
    ========================================================================== */
 (function () {
   "use strict";
@@ -197,7 +197,7 @@
       q: "Vad betyder \"ränta på ränta\"?",
       options: ["Banken tar dina pengar", "Din sparade ränta börjar också växa", "Du måste betala extra avgift"],
       correct: 1,
-      explain: "Ränta på ränta betyder att även avkastningen du redan fått börjar växa – det gör att sparandet accelererar över tid.",
+      explain: "Ränta på ränta betyder att även avkastningen du redan fått börjar växa, och det gör att sparandet accelererar över tid.",
     },
     {
       q: "Vilket är smartast om du vill köpa något dyrt, som en ny cykel?",
@@ -212,7 +212,7 @@
       q: "Du sparar 10 000 kr till 7% ränta per år. Ungefär hur mycket har du efter 10 år, tack vare ränta på ränta?",
       options: ["10 700 kr", "Ca 20 000 kr", "50 000 kr"],
       correct: 1,
-      explain: "10 000 kr växer till ca 19 700 kr efter 10 år vid 7% årlig avkastning — nästan en fördubbling.",
+      explain: "10 000 kr växer till ca 19 700 kr efter 10 år vid 7% årlig avkastning, nästan en fördubbling.",
     },
     {
       q: "Vad är ett UF-företag?",
@@ -230,13 +230,13 @@
       q: "Vad är inflation?",
       options: ["Att priserna generellt stiger över tid, så pengar köper mindre", "Att räntan på lån sänks", "Att aktiekurser alltid går upp"],
       correct: 0,
-      explain: "Inflation gör att samma summa pengar köper mindre i framtiden — ett skäl till att pengar som bara ligger stilla långsamt tappar köpkraft.",
+      explain: "Inflation gör att samma summa pengar köper mindre i framtiden. Det är ett skäl till att pengar som bara ligger stilla långsamt tappar köpkraft.",
     },
     {
       q: "Du får ditt första extrajobb. Vad händer automatiskt med en del av lönen?",
       options: ["Den sätts automatiskt in på ett sparkonto", "Skatt dras innan du får lönen utbetald", "Inget, du får hela beloppet kontant"],
       correct: 1,
-      explain: "Arbetsgivaren drar skatt direkt från din bruttolön — det du får utbetalt är din nettolön.",
+      explain: "Arbetsgivaren drar skatt direkt från din bruttolön. Det du får utbetalt är din nettolön.",
     },
   ];
 
@@ -304,7 +304,7 @@
             '<div class="badge-emoji">' + badge.emoji + "</div>" +
             '<h3 id="diploma-greeting">Grattis!</h3>' +
             '<div style="font-weight:800;font-size:1.1rem;margin-top:2px;">' + badge.title + "</div>" +
-            '<div class="diploma-score">Du fick ' + score + " av " + total + " rätt i SparaPengars pengaquiz.</div>" +
+            '<div class="diploma-score">Du fick ' + score + " av " + total + " rätt i Guldgrisens pengaquiz.</div>" +
           "</div>" +
           '<div class="diploma-actions">' +
             '<button type="button" class="btn btn-secondary" id="quiz-print-btn">🖨️ Skriv ut ditt diplom</button>' +

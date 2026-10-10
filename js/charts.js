@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SparaPengar — delat diagram-bibliotek (canvas, inga externa beroenden)
+   Guldgrisen — delat diagram-bibliotek (canvas, inga externa beroenden)
    Mark-specs: 2px linjer, 4px rundade stapeltoppar, hairline-gridlines,
    area-fill ~10% opacitet, legend för 2+ serier, hover-tooltip + crosshair.
    ========================================================================== */

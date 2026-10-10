@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SparaPengar — Skuld- & amorteringskalkylatorn (bolån + privatlån/krediter)
+   Guldgrisen — Skuld- & amorteringskalkylatorn (bolån + privatlån/krediter)
    ========================================================================== */
 (function () {
   "use strict";
@@ -30,7 +30,7 @@
     { namn: "Kreditkort", skuld: 25000, ranta: 19.9, betalning: 800 },
   ];
   const STRATEGI_HINT = {
-    lavin: "Extra pengar går till lånet med högst ränta. När ett lån är betalt flyttas dess månadsbetalning till nästa — du betalar lika mycket varje månad men blir skuldfri snabbare. Ger lägst total ränta.",
+    lavin: "Extra pengar går till lånet med högst ränta. När ett lån är betalt flyttas dess månadsbetalning till nästa. Du betalar lika mycket varje månad men blir skuldfri snabbare. Ger lägst total ränta.",
     snoboll: "Extra pengar går till lånet med minst skuld. När ett lån är betalt flyttas dess månadsbetalning till nästa. Kostar ofta lite mer i ränta, men du får snabba delsegrar som gör det lättare att hålla i.",
   };
 
@@ -102,7 +102,7 @@
           forLaga.map(function (l) {
             return "<strong>" + escapeHtml(l.namn) + "</strong> (minst " + formatKr(Math.ceil(l.skuld * l.ranta / 100 / 12 / 10) * 10 + 10) + "/mån)";
           }).join(", ") +
-          " — skulden kommer aldrig minska. Höj betalningen för att den ska börja gå ner.</div>";
+          ". Skulden kommer aldrig att minska. Höj betalningen för att den ska börja gå ner.</div>";
         document.getElementById("stat-tid").textContent = "–";
         document.getElementById("stat-ranta-hint").textContent = "";
         compareArea.innerHTML = "";
@@ -206,8 +206,8 @@
   const BOLANETAK = 0.9;
   const TYP_HINT = {
     krav: "Du amorterar bara det lagen kräver: 2 % av lånet per år när belåningsgraden är över 70 %, 1 % när den är över 50 % och inget krav under 50 %. Så amorterar många i Sverige.",
-    rak: "Samma amortering varje månad — månadskostnaden är högst i början och sjunker i takt med att lånet och räntan minskar. Amorteringskravet gäller som lägsta nivå.",
-    annuitet: "Samma månadskostnad hela löptiden — i början går det mesta till ränta och lite till amortering. Vanligt i Norge och Danmark. Amorteringskravet gäller som lägsta nivå.",
+    rak: "Samma amortering varje månad. Månadskostnaden är högst i början och sjunker i takt med att lånet och räntan minskar. Amorteringskravet gäller som lägsta nivå.",
+    annuitet: "Samma månadskostnad hela löptiden. I början går det mesta till ränta och lite till amortering. Vanligt i Norge och Danmark. Amorteringskravet gäller som lägsta nivå.",
   };
 
   function formatProcent(andel) {
@@ -288,7 +288,7 @@
         : "50 år är vanligt i Sverige, 30 år i t.ex. Norge och Danmark. Du kan också skriva in en egen löptid.";
 
       warningArea.innerHTML = belaningsgrad > BOLANETAK
-        ? '<div class="warning-box">⚠️ Bolånetaket är 90 % — du behöver minst <strong>' + formatKr(varde * (1 - BOLANETAK)) + "</strong> i kontantinsats för en bostad värd " + formatKr(varde) + ". Resten måste i så fall lånas på annat sätt, t.ex. med ett dyrare privatlån.</div>"
+        ? '<div class="warning-box">⚠️ Bolånetaket är 90 %, så du behöver minst <strong>' + formatKr(varde * (1 - BOLANETAK)) + "</strong> i kontantinsats för en bostad värd " + formatKr(varde) + ". Resten måste i så fall lånas på annat sätt, t.ex. med ett dyrare privatlån.</div>"
         : "";
 
       const lanParams = { belopp: belopp, ranta: ranta, ar: ar, typ: typ, varde: varde };
@@ -309,9 +309,9 @@
         if (typ !== "krav") {
           let planText = "Din plan amorterar mer än kravet hela vägen. ✓";
           if (base.kravStyr) {
-            planText = "Din plan amorterar periodvis mindre än kravet — där har vi räknat med kravet istället.";
+            planText = "Din plan amorterar periodvis mindre än kravet. Där har vi räknat med kravet istället.";
           } else if (typ === "rak" && 1 / ar > kravNu) {
-            planText = "Rak amortering på " + ar + " år amorterar " + (Math.round(1000 / ar) / 10).toLocaleString("sv-SE") + " % per år — mer än kravet. " +
+            planText = "Rak amortering på " + ar + " år amorterar " + (Math.round(1000 / ar) / 10).toLocaleString("sv-SE") + " % per år, vilket är mer än kravet. " +
               "Banker räknar ofta bara med kravet; välj \"Amorteringskravet\" för att jämföra.";
           }
           html += '<div class="hint">' + planText + "</div>";

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SparaPengar — delad beräkningslogik (ränta-på-ränta m.m.)
+   Guldgrisen — delad beräkningslogik (ränta-på-ränta m.m.)
    Används av ranta.js, budget.js och barn.js
    ========================================================================== */
 
@@ -269,6 +269,78 @@ function uppskattaNettolon(p) {
   const skatt = brutto * sats;
   const netto = brutto - skatt;
   return { brutto: Math.round(brutto), netto: Math.round(netto), skatt: Math.round(skatt), skattesats: Math.round(sats * 1000) / 10 };
+}
+
+/**
+ * Billån som annuitet, med eller utan restvärde (ballongbetalning i slutet).
+ * Med restvärde betalar du bara av lånet ner till restvärdet under löptiden — resten
+ * betalas som en klumpsumma sista månaden (eller refinansieras / löses vid bilbyte).
+ * @param {Object} p
+ * @param {number} p.belopp       kr, lånebelopp (pris minus kontantinsats)
+ * @param {number} p.ranta        årlig nominell ränta i %, t.ex. 6.5
+ * @param {number} p.manader      löptid i månader
+ * @param {number} [p.restvarde]  kr, kvar att betala när löptiden är slut (0 = vanligt billån)
+ * @param {number} [p.uppl]       kr, uppläggningsavgift (dras vid start)
+ * @param {number} [p.avi]        kr/månad, aviavgift
+ * @returns {{manadsbetalning:number, restvarde:number, rows:Array<{manad:number, kvar:number}>,
+ *   totalRanta:number, avgifter:number, kreditkostnad:number, totalBetalt:number, effektivRanta:number}}
+ *   manadsbetalning inkluderar aviavgift; effektivRanta i % per år
+ */
+function beraknaBillan(p) {
+  const belopp = Math.max(0, p.belopp || 0);
+  const n = Math.max(1, Math.round(p.manader || 1));
+  const r = (p.ranta || 0) / 100 / 12;
+  const restvarde = Math.min(belopp, Math.max(0, p.restvarde || 0));
+  const uppl = Math.max(0, p.uppl || 0);
+  const avi = Math.max(0, p.avi || 0);
+
+  // Annuitet där nuvärdet av restvärdet räknas bort från det som amorteras under löptiden
+  const annuitet = r > 0
+    ? (belopp - restvarde * Math.pow(1 + r, -n)) * r / (1 - Math.pow(1 + r, -n))
+    : (belopp - restvarde) / n;
+
+  let kvar = belopp, totalRanta = 0;
+  const rows = [{ manad: 0, kvar: Math.round(kvar) }];
+  for (let m = 1; m <= n; m++) {
+    const ranta = kvar * r;
+    totalRanta += ranta;
+    kvar = Math.max(0, kvar - (annuitet - ranta));
+    rows.push({ manad: m, kvar: Math.round(kvar) });
+  }
+
+  const avgifter = uppl + avi * n;
+  return {
+    manadsbetalning: Math.round(annuitet + avi),
+    restvarde: Math.round(restvarde),
+    rows: rows,
+    totalRanta: Math.round(totalRanta),
+    avgifter: Math.round(avgifter),
+    kreditkostnad: Math.round(totalRanta + avgifter),
+    totalBetalt: Math.round(annuitet * n + restvarde + avgifter),
+    effektivRanta: belopp > 0 ? effektivRanta(belopp - uppl, annuitet + avi, n, restvarde) : 0,
+  };
+}
+
+/**
+ * Effektiv årsränta (inkl. avgifter) via bisektion på månadsräntan.
+ * @param {number} utbetalt  kr, det du faktiskt får vid start (lån minus uppläggningsavgift)
+ * @param {number} betalning kr/månad inkl. avgifter
+ * @param {number} n         antal månader
+ * @param {number} slut      kr, klumpsumma sista månaden (restvärde)
+ * @returns {number} % per år, en decimal
+ */
+function effektivRanta(utbetalt, betalning, n, slut) {
+  function nuvarde(i) {
+    const v = Math.pow(1 + i, -n);
+    return (i > 0 ? betalning * (1 - v) / i : betalning * n) + slut * v;
+  }
+  if (utbetalt <= 0 || nuvarde(0) <= utbetalt) return 0;
+  let lo = 0, hi = 1;
+  for (let k = 0; k < 100; k++) {
+    const mid = (lo + hi) / 2;
+    if (nuvarde(mid) > utbetalt) lo = mid; else hi = mid;
+  }
+  return Math.round((Math.pow(1 + lo, 12) - 1) * 1000) / 10;
 }
 
 /** Formaterar kr utan decimaler, med tusentalsavgränsare (sv-SE). */

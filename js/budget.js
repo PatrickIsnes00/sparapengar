@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SparaPengar — Hitta dina besparingar (budgetverktyg)
+   Guldgrisen — Hitta dina besparingar (budgetverktyg)
    ========================================================================== */
 (function () {
   "use strict";
@@ -9,16 +9,16 @@
   const EXPENSE_CONFIG = [
     { key: "boende", label: "Boende / hyra", group: "fixed", current: 8000, saving: 0, andel: 0 },
     { key: "el", label: "El & uppvärmning", group: "fixed", current: 800, saving: 0, andel: 0.1, tips: "Jämför elavtal en gång per år och sänk inomhustemperaturen en grad." },
-    { key: "forsakring", label: "Försäkringar", group: "fixed", current: 400, saving: 0, andel: 0.1, tips: "Jämför försäkringar och samla dem hos ett bolag — det ger ofta rabatt." },
+    { key: "forsakring", label: "Försäkringar", group: "fixed", current: 400, saving: 0, andel: 0.1, tips: "Jämför försäkringar och samla dem hos ett bolag, vilket ofta ger rabatt." },
     { key: "telefon", label: "Telefon & internet", group: "fixed", current: 500, saving: 0, andel: 0.25, tips: "Jämför operatörer och välj en mindre surfmängd om du sällan använder hela." },
-    { key: "abonnemang", label: "Abonnemang (Netflix, Spotify m.m.)", group: "fixed", current: 300, saving: 100, andel: 0.4, tips: "Rotera streamingtjänster — ha en åt gången i stället för alla samtidigt." },
+    { key: "abonnemang", label: "Abonnemang (Netflix, Spotify m.m.)", group: "fixed", current: 300, saving: 100, andel: 0.4, tips: "Rotera streamingtjänster och ha en åt gången i stället för alla samtidigt." },
     { key: "lan", label: "Lån & krediter", group: "fixed", current: 0, saving: 0, andel: 0, tips: 'Se om du kan betala av dyra lån snabbare i <a href="skuldkalkylator.html#privatlan">skuldkalkylatorn</a>.' },
     { key: "mat", label: "Mat (livsmedel)", group: "variable", current: 4000, saving: 200, andel: 0.1, tips: "Planera en veckomeny och handla en gång i veckan med inköpslista." },
     { key: "drivmedel", label: "Drivmedel / kollektivtrafik", group: "variable", current: 1200, saving: 0, andel: 0.1, tips: "Samåk, cykla korta sträckor eller se om ett periodkort lönar sig." },
     { key: "utemat", label: "Utemat & fika", group: "variable", current: 1500, saving: 500, andel: 0.4, tips: "Ta med matlåda tre dagar i veckan och kaffe i termos." },
     { key: "nojen", label: "Nöje & prenumerationer", group: "variable", current: 400, saving: 0, andel: 0.25, tips: "Säg upp det du inte har använt den senaste månaden." },
     { key: "klader", label: "Kläder", group: "variable", current: 500, saving: 100, andel: 0.25, tips: "Prova 30 dagars köp-paus och kolla second hand först." },
-    { key: "ovrigt", label: "Övrigt", group: "variable", current: 500, saving: 0, andel: 0.2, tips: "Gå igenom senaste kontoutdraget — här gömmer sig ofta impulsköpen." },
+    { key: "ovrigt", label: "Övrigt", group: "variable", current: 500, saving: 0, andel: 0.2, tips: "Gå igenom senaste kontoutdraget, där gömmer sig ofta impulsköpen." },
   ];
 
   function rowHtml(item) {
@@ -145,7 +145,7 @@
       suggestList.innerHTML = html;
       suggestList.hidden = false;
       document.getElementById("suggest-note").textContent =
-        "Förslagen är tumregler, inte en analys av just din ekonomi — justera siffrorna så de passar dig." +
+        "Förslagen är tumregler, inte en analys av just din ekonomi. Justera siffrorna så de passar dig." +
         (hoppadeOver > 0 ? " Poster där du själv fyllt i en besparing har vi inte ändrat." : "");
       render();
     });

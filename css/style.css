@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SparaPengar — delat designsystem
+   Guldgrisen — delat designsystem
    ========================================================================== */
 
 :root {
@@ -167,7 +167,7 @@ button, input, select { font-family: inherit; font-size: inherit; color: inherit
 .brand:hover { text-decoration: none; }
 .brand .logo-mark {
   width: 34px; height: 34px; border-radius: 10px;
-  background: linear-gradient(135deg, var(--series-1), var(--series-3));
+  background: linear-gradient(135deg, #f7d774, #d4a017);
   display: flex; align-items: center; justify-content: center;
   font-size: 18px;
 }
@@ -800,3 +800,9 @@ table.data-table tr.selected td { background: var(--brand-wash); font-weight: 70
 .content-page { max-width: 74ch; }
 .content-page h2 { font-size: 1.25rem; margin-top: 1.8em; }
 .policy-updated { font-size: 0.82rem; color: var(--text-muted); margin-top: -8px; margin-bottom: 24px; }
+
+/* ---------- Guider: teman och metarad ---------- */
+.guide-tema + .guide-tema { margin-top: 40px; }
+.guide-tema h2 { font-size: 1.25rem; margin-bottom: 14px; }
+.article-meta { font-size: 0.82rem; color: var(--text-muted); margin: -4px 0 14px; }
+.tool-card .article-meta { margin: 0 0 10px; }
