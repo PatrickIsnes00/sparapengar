@@ -282,9 +282,13 @@ function uppskattaNettolon(p) {
  * @param {number} [p.restvarde]  kr, kvar att betala när löptiden är slut (0 = vanligt billån)
  * @param {number} [p.uppl]       kr, uppläggningsavgift (dras vid start)
  * @param {number} [p.avi]        kr/månad, aviavgift
+ * @param {number} [p.extra]      kr/månad, extra amortering utöver planen. Gör lånet klart tidigare,
+ *                                eller sänker restvärdet som återstår i slutet.
  * @returns {{manadsbetalning:number, restvarde:number, rows:Array<{manad:number, kvar:number}>,
- *   totalRanta:number, avgifter:number, kreditkostnad:number, totalBetalt:number, effektivRanta:number}}
- *   manadsbetalning inkluderar aviavgift; effektivRanta i % per år
+ *   totalRanta:number, avgifter:number, kreditkostnad:number, totalBetalt:number, effektivRanta:number,
+ *   skuldfriManad:(number|null)}}
+ *   manadsbetalning inkluderar aviavgift men inte extra; restvarde = det som återstår efter löptiden;
+ *   effektivRanta i % per år för lånets villkor (utan extra); skuldfriManad = månaden lånet blev helt betalt
  */
 function beraknaBillan(p) {
   const belopp = Math.max(0, p.belopp || 0);
@@ -293,31 +297,40 @@ function beraknaBillan(p) {
   const restvarde = Math.min(belopp, Math.max(0, p.restvarde || 0));
   const uppl = Math.max(0, p.uppl || 0);
   const avi = Math.max(0, p.avi || 0);
+  const extra = Math.max(0, p.extra || 0);
 
   // Annuitet där nuvärdet av restvärdet räknas bort från det som amorteras under löptiden
   const annuitet = r > 0
     ? (belopp - restvarde * Math.pow(1 + r, -n)) * r / (1 - Math.pow(1 + r, -n))
     : (belopp - restvarde) / n;
 
-  let kvar = belopp, totalRanta = 0;
+  let kvar = belopp, totalRanta = 0, betalt = 0, manaderBetalt = 0, skuldfriManad = null;
   const rows = [{ manad: 0, kvar: Math.round(kvar) }];
   for (let m = 1; m <= n; m++) {
-    const ranta = kvar * r;
-    totalRanta += ranta;
-    kvar = Math.max(0, kvar - (annuitet - ranta));
+    // Raderna fortsätter med 0 efter att lånet är betalt, så att grafer kan jämföra lika långa serier
+    if (kvar > 0.005) {
+      const ranta = kvar * r;
+      const betalning = Math.min(kvar + ranta, annuitet + extra);
+      totalRanta += ranta;
+      betalt += betalning;
+      manaderBetalt = m;
+      kvar = Math.max(0, kvar - (betalning - ranta));
+      if (kvar <= 0.005 && skuldfriManad === null) skuldfriManad = m;
+    }
     rows.push({ manad: m, kvar: Math.round(kvar) });
   }
 
-  const avgifter = uppl + avi * n;
+  const avgifter = uppl + avi * manaderBetalt;
   return {
     manadsbetalning: Math.round(annuitet + avi),
-    restvarde: Math.round(restvarde),
+    restvarde: Math.round(kvar),
     rows: rows,
     totalRanta: Math.round(totalRanta),
     avgifter: Math.round(avgifter),
     kreditkostnad: Math.round(totalRanta + avgifter),
-    totalBetalt: Math.round(annuitet * n + restvarde + avgifter),
+    totalBetalt: Math.round(betalt + kvar + avgifter),
     effektivRanta: belopp > 0 ? effektivRanta(belopp - uppl, annuitet + avi, n, restvarde) : 0,
+    skuldfriManad: skuldfriManad,
   };
 }
 

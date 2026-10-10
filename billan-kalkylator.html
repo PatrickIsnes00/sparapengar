@@ -84,6 +84,13 @@
             <input type="number" id="bil-avi" value="49" min="0" step="1">
             <div class="hint">Kolla långivarens prislista, eftersom avgifterna påverkar den effektiva räntan.</div>
           </div>
+
+          <div class="field">
+            <label for="bil-extra">Extra betalning per månad <span class="field-value" id="val-bil-extra">500 kr</span></label>
+            <input type="number" id="bil-extra" value="500" min="0" step="100">
+            <input type="range" id="bil-extra-r" value="500" min="0" max="10000" step="100">
+            <div class="hint">Se vad som händer om du betalar lite extra varje månad. De flesta billån går att amortera extra utan avgift.</div>
+          </div>
         </div>
 
         <div>
@@ -102,6 +109,13 @@
             </div>
           </div>
           <p id="bil-sammanfattning" style="font-weight:600;color:var(--text-primary);"></p>
+
+          <div class="chart-card" id="bil-extra-card" hidden>
+            <div class="chart-head">
+              <h3 id="bil-extra-rubrik">Med extra betalning</h3>
+            </div>
+            <div class="compare-callout" id="bil-extra-jamfor" style="margin:0;"></div>
+          </div>
 
           <div class="chart-card">
             <div class="chart-head">

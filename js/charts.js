@@ -73,7 +73,17 @@
       span.className = "key";
       const sw = document.createElement("span");
       sw.className = "swatch";
-      sw.style.background = it.color;
+      if (it.dashed) {
+        // Streckad serie: visa en streckad linje i stället för en fylld ruta
+        sw.style.background = "transparent";
+        sw.style.height = "0";
+        sw.style.width = "16px";
+        sw.style.borderRadius = "0";
+        sw.style.borderTop = "2px dashed " + it.color;
+        sw.style.verticalAlign = "middle";
+      } else {
+        sw.style.background = it.color;
+      }
       span.appendChild(sw);
       span.appendChild(document.createTextNode(it.label));
       container.appendChild(span);
@@ -323,7 +333,7 @@
     const n = config.xLabels.length;
 
     if (config.legendEl && series.length > 1) {
-      buildLegend(config.legendEl, series.map(function (s) { return { label: s.label, color: cssVar(s.color) }; }));
+      buildLegend(config.legendEl, series.map(function (s) { return { label: s.label, color: cssVar(s.color), dashed: s.dashed }; }));
     } else if (config.legendEl) {
       config.legendEl.innerHTML = "";
     }
@@ -380,13 +390,16 @@
       series.forEach(function (s) {
         const color = cssVar(s.color);
 
-        ctx.beginPath();
-        ctx.moveTo(xFor(0), yFor(0));
-        for (let i = 0; i < n; i++) ctx.lineTo(xFor(i), yFor(s.values[i] || 0));
-        ctx.lineTo(xFor(n - 1), yFor(0));
-        ctx.closePath();
-        ctx.fillStyle = hexToRgba(color, 0.08);
-        ctx.fill();
+        // Streckade serier (t.ex. "med extra betalning") ritas utan yta så att de inte skymmer huvudserien
+        if (!s.dashed) {
+          ctx.beginPath();
+          ctx.moveTo(xFor(0), yFor(0));
+          for (let i = 0; i < n; i++) ctx.lineTo(xFor(i), yFor(s.values[i] || 0));
+          ctx.lineTo(xFor(n - 1), yFor(0));
+          ctx.closePath();
+          ctx.fillStyle = hexToRgba(color, 0.08);
+          ctx.fill();
+        }
 
         ctx.beginPath();
         ctx.moveTo(xFor(0), yFor(s.values[0] || 0));
@@ -395,7 +408,9 @@
         ctx.strokeStyle = color;
         ctx.lineJoin = "round";
         ctx.lineCap = "round";
+        ctx.setLineDash(s.dashed ? [6, 5] : []);
         ctx.stroke();
+        ctx.setLineDash([]);
 
         const lastIdx = n - 1;
         ctx.beginPath();

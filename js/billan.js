@@ -34,6 +34,7 @@
       rest: document.getElementById("bil-rest"), restR: document.getElementById("bil-rest-r"),
       uppl: document.getElementById("bil-uppl"),
       avi: document.getElementById("bil-avi"),
+      extra: document.getElementById("bil-extra"), extraR: document.getElementById("bil-extra-r"),
     };
     const manadBtns = document.querySelectorAll("#bil-manader-presets .preset-btn");
 
@@ -48,6 +49,7 @@
       const restProcent = Math.max(0, parseFloat(els.rest.value) || 0);
       const uppl = Math.max(0, parseFloat(els.uppl.value) || 0);
       const avi = Math.max(0, parseFloat(els.avi.value) || 0);
+      const extra = Math.max(0, parseFloat(els.extra.value) || 0);
       // Restvärdet anges som andel av bilens pris men kan aldrig vara större än lånet
       const restvardeOnskat = pris * restProcent / 100;
       const restMojligt = manader <= MAX_REST_MANADER;
@@ -63,6 +65,7 @@
       setText("val-bil-rest", formatProcent(restProcent));
       setText("val-bil-uppl", formatKr(uppl));
       setText("val-bil-avi", formatKr(avi));
+      setText("val-bil-extra", formatKr(extra));
       manadBtns.forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-manader") === String(manader)); });
 
       setText("bil-insats-hint", "Långivare kräver nästan alltid minst 20 % i kontantinsats, för den här bilen " + formatKr(pris * MIN_INSATS) + ".");
@@ -118,8 +121,37 @@
         return "<tr" + (i === rader.length - 1 ? ' class="total"' : "") + "><td>" + r[0] + "</td><td>" + r[1] + "</td><td>" + (restMojligt ? r[2] : "–") + "</td></tr>";
       }).join("");
 
-      const series = [{ label: "Utan restvärde", color: "--series-1", values: utan.rows.map(function (r) { return r.kvar; }) }];
-      if (med.restvarde > 0) series.push({ label: "Med restvärde", color: "--series-2", values: med.rows.map(function (r) { return r.kvar; }) });
+      // Extra betalning: jämför samma lån med och utan extra amortering varje månad
+      const extraAktiv = extra > 0 && belopp > 0;
+      const utanExtra = extraAktiv ? beraknaBillan(Object.assign({}, bas, { extra: extra })) : null;
+      const medExtra = extraAktiv && med.restvarde > 0 ? beraknaBillan(Object.assign({}, bas, { restvarde: restvarde, extra: extra })) : null;
+      document.getElementById("bil-extra-card").hidden = !extraAktiv;
+      if (extraAktiv) {
+        setText("bil-extra-rubrik", "Med " + formatKr(extra) + " extra varje månad");
+        const tidigare = manader - utanExtra.skuldfriManad;
+        const kolumner = [
+          '<div class="compare-col improved"><div class="ccl-label">Utan restvärde</div>' +
+          '<div class="ccl-value">Klart efter ' + formatLoptid(utanExtra.skuldfriManad) + "</div>" +
+          '<div class="hint">' + (tidigare > 0 ? tidigare + " mån tidigare och " : "") +
+          formatKr(utan.totalRanta - utanExtra.totalRanta) + " mindre i ränta.</div></div>",
+        ];
+        if (medExtra) {
+          kolumner.push('<div class="compare-col improved"><div class="ccl-label">Med restvärde</div>' +
+            (medExtra.skuldfriManad
+              ? '<div class="ccl-value">Klart efter ' + formatLoptid(medExtra.skuldfriManad) + "</div>" +
+                '<div class="hint">Inget restvärde kvar att betala, och ' + formatKr(med.totalRanta - medExtra.totalRanta) + " mindre i ränta.</div>"
+              : '<div class="ccl-value">' + formatKr(medExtra.restvarde) + " kvar i slutet</div>" +
+                '<div class="hint">I stället för ' + formatKr(med.restvarde) + ". Du betalar " + formatKr(med.totalRanta - medExtra.totalRanta) + " mindre i ränta.</div>") +
+            "</div>");
+        }
+        document.getElementById("bil-extra-jamfor").innerHTML = kolumner.join("");
+      }
+
+      function kvarVarden(res) { return res.rows.map(function (r) { return r.kvar; }); }
+      const series = [{ label: "Utan restvärde", color: "--series-1", values: kvarVarden(utan) }];
+      if (utanExtra) series.push({ label: "Utan restvärde + extra", color: "--series-1", values: kvarVarden(utanExtra), dashed: true });
+      if (med.restvarde > 0) series.push({ label: "Med restvärde", color: "--series-2", values: kvarVarden(med) });
+      if (medExtra) series.push({ label: "Med restvärde + extra", color: "--series-2", values: kvarVarden(medExtra), dashed: true });
       SPCharts.renderLineChart(document.getElementById("bil-chart"), {
         xLabels: utan.rows.map(function (r) { return "Mån " + r.manad; }),
         series: series,
@@ -138,7 +170,7 @@
       }).join("");
     }
 
-    [["pris", "prisR"], ["insats", "insatsR"], ["ranta", "rantaR"], ["rest", "restR"]]
+    [["pris", "prisR"], ["insats", "insatsR"], ["ranta", "rantaR"], ["rest", "restR"], ["extra", "extraR"]]
       .forEach(function (pair) { syncPair(els[pair[0]], els[pair[1]], render); });
     [els.manader, els.uppl, els.avi].forEach(function (el) { el.addEventListener("input", render); });
     manadBtns.forEach(function (btn) {
